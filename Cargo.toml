@@ -1,0 +1,9 @@
+[package]
+name = "alle"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+geoutils = "0.5.1"
+gpx = "0.8.6"
+chrono ="0.4"
