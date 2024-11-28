@@ -1,1 +1,13 @@
-/target
+# Node.js 관련
+node_modules/
+
+# Rust 관련
+target/
+Cargo.lock
+
+# SUI 관련
+move/
+
+# OS 생성 파일들
+.DS_Store
+Thumbs.db
