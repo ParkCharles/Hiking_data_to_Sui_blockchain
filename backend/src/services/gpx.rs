@@ -22,9 +22,7 @@ pub fn parse_gpx_to_waypoints(file_path: &str) -> Result<Vec<serde_json::Value>,
             track
                 .segments
                 .iter()
-                .flat_map(|segment| {
-                    segment.points.iter()
-                })
+                .flat_map(|segment| segment.points.iter())
         })
         .collect();
 

@@ -21,3 +21,5 @@ uuid = { version = "1.4", features = ["v4"] }
 actix-web = "4.9.0"
 actix-rt ="2.10.0"
 tokio = { version = "1", features = ["full"] }
+reqwest = "0.12.9"
+warp = "0.3"

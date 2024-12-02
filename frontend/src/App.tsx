@@ -1,86 +1,78 @@
-import { useState, useEffect } from 'react'
-import { mintNFT, fetchSuiBalance } from './services/suiService';
-import './App.css'
+import {useState} from 'react'
 
-// 생성된 NFT의 Default 주소 
-const address = '0xc94742f9bc07ef9c2849120819ec8955eecaf6a2dd9f2b78ee1d47f0d693b304';
+const App = () => {
+  const [name, setName] = useState('');                               // NFT 이름 상태
+  const [description, setDescription] = useState('');                 // NFT 설명 상태
+  const [url, setUrl] = useState('');                                 // 외부 리소스 URL 상태
+  const [wallet, setWallet] = useState('');             // 지갑 주소 상태
+  const [file, setFile] = useState<File | null>(null);              // GPX에서 추출한 waypoints 저장
 
-function App() {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [url, setUrl] = useState('');
-  const [mintStatus, setMintStatus] = useState<string | null>(null);
-  const [balance, setBalance] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  // 잔액 조회
-  useEffect(() => {
-    const fetchBalance = async () => {
-      const balance = await fetchSuiBalance(address);
-      setBalance(balance);
-    };
-    fetchBalance();
-  }, []);
-  
-  // NFT 민팅
-  const handleMintNFT = async () => {
-    if (!name || !description || !url) {
-      setMintStatus('Please provide all fields.');
+  // 기본정보 입력
+  const handleSubmit = async () => {
+    if (!name || !description || !url || !wallet || !file) {
+      alert('모든 필드를 입력해 주세요.');
       return;
     }
 
-    setIsLoading(true);
-    setMintStatus(null);
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    formData.append('url', url);
+    formData.append('wallet', wallet);
+    formData.append('file', file);
 
     try {
-      const result = await mintNFT(name, description, url);
-      setMintStatus(`NFT Minted Seccessfully! Transaction ID: ${result.txId}`);
-    } catch (error: any) {
-      setMintStatus(`Error minting NFT: ${error.message}`);
-    } finally {
-      setIsLoading(false);
+      const response = await fetch('http://localhost:3000/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const result = await response.json();
+      alert(`NFT 생성 성공: Transaction ID - ${result.txId}`);
+    } catch (error) {
+      console.error('에러 발생:', error);
+      alert('NFT 생성 중 오류가 발생했습니다.');
     }
   };
-
+  
   return (
-    <div className="App">
-      <h1>Mint Your NFT</h1>
-
-      {/* NFT 민팅 입력폼 */}
-      <div>
-        <input
-          type="text"
-          placeholder="Enter NFT Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Enter NFT Description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <input
-          type="text"
-          placeholder="Enter NFT URL"
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-        />
-        <button onClick={handleMintNFT} disabled={isLoading}>
-          {isLoading ? 'Minting...' : 'Mint NFT'}
-          </button>
-      </div>
-
-      {/* 민팅 상태 표시 */}
-      {mintStatus && <p>{mintStatus}</p>}
-
-      {/* 잔액 표시 */}
-      <div>
-        <h2>SUI Wallet Balance</h2>
-        {balance ? <p>Balance: {balance} SUI</p> : <p>Loading balance...</p>}
-      </div>
+    <div>
+      <h1>NFT 생성 테스트</h1>
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSubmit();
+        }}
+      >
+        <label>
+          NFT 이름:
+          <input type="text" value={name} onChange={(e) => setName(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          설명:
+          <input type="text" value={description} onChange={(e) => setDescription(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          URL:
+          <input type="text" value={url} onChange={(e) => setUrl(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          지갑 주소:
+          <input type="text" value={wallet} onChange={(e) => setWallet(e.target.value)} />
+        </label>
+        <br />
+        <label>
+          GPX 파일:
+          <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
+        </label>
+        <br />
+        <button type="submit">Submit</button>
+      </form>
     </div>
   );
-}
+};
 
-export default App
+  
+  export default App;

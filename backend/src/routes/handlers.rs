@@ -1,38 +1,27 @@
-// 사용자가 업로드한 GPX 파일의 유효성을 검사하고, 서버에 저장한 후 저장 경로를 반환
+use actix_web::{post, web, Responder};
+use std::fs;
+use serde_json::json;
+use crate::services::gpx;
+use crate::models::structs::NFTRequest;
 
-use actix_web::{web, HttpResponse, Responder};
-use crate::utils::{validate_gpx_file, save_file};
-use uuid::Uuid;
-
-// init 함수 정의
-pub fn init(cfg: &mut web::ServiceConfig) {
-    cfg.route("/", web::get().to(index)); // '/' 경로에 대한 라우트 설정
-}
-
-// 핸들러 함수
-async fn index() -> impl Responder {
-    HttpResponse::Ok().body("Hello, Actix Web!")
-}
-
-/// GPX 파일 업로드 핸들러
-pub async fn upload_gpx_file(file: web::Bytes) -> impl Responder {
-    // 파일 데이터를 받아온 후 문자열로 변환 (UTF-8)
-    let file_content = match std::str::from_utf8(&file) {
-        Ok(content) => content,
-        Err(_) => return HttpResponse::BadRequest().body("Invalid file format."),
-    };
-
-    // 파일 유효성 검사
-    if let Err(validation_error) = validate_gpx_file(file_content) {
-        return HttpResponse::BadRequest().body(format!("Invalid GPX file: {}", validation_error));
-    }
+#[post("/upload")]
+async fn upload(
+    req: web::Json<NFTRequest>,
+    file: web::Bytes,
+) -> impl Responder {
+    let file_path = "/tmp/uploaded.gpx";
 
     // 파일 저장
-    let file_name = format!("{}.gpx", Uuid::new_v4());    // 고유한 파일 이름 생성
-    let save_result = save_file(&file, &file_name, "uploaded_files");   // 수정된 함수 호출
-    
-    match save_result {
-        Ok(save_path) => HttpResponse::Ok().body(format!("File successfully uploaded and saved at: {}", save_path)),
-        Err(save_error) => HttpResponse::InternalServerError().body(format!("File save error: {}", save_error)),
+    if let Err(e) = fs::write(file_path, &file) {
+        return web::Json(json!({ "error": format!("파일 저장 실패: {}", e) }));
+    }
+
+    // GPX 파일 파싱
+    match gpx::parse_gpx_to_waypoints(file_path) {
+        Ok(waypoints) => {
+            // TODO: SUI NFT 민팅 로직 추가
+            web::Json(json!({ "txId": "dummy-tx-id" }))
+        }
+        Err(err) => web::Json(json!({ "error": err })),
     }
 }
