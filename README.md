@@ -1,4 +1,4 @@
-# Garmin Hiking Data Integration with SUI Blockchain
+# Hiking Data Integration with SUI Blockchain
 
 This project demonstrates how to integrate Garmin hiking data into a service that records and stores the data on the SUI blockchain. The goal is to create a simple yet effective way to track hiking activities, including essential metrics like location, elevation, and time, while utilizing the decentralized benefits of blockchain technology.
 
@@ -19,3 +19,8 @@ Use Case:
 This service is designed for hikers and outdoor enthusiasts who want to track their hiking data in a secure, immutable way, leveraging blockchain technology to preserve and share their activity logs.
 
 Feel free to explore the code, contribute, and suggest improvements!
+
+1. 환경 설정 및 소프트웨어 설치
+- Frondend: **Vite** (https://vite.dev/guide/)
+- Backend: **Rust** (https://www.rust-lang.org/tools/install)
+- Smart Contract: **Sui** (https://docs.sui.io/guides/developer/getting-started/sui-install)
