@@ -1,10 +1,22 @@
 import { useState } from 'react';
+import '@mysten/dapp-kit/dist/index.css';     // dApp Kit CSS 가져오기
+import { createNetworkConfig, SuiClientProvider, WalletProvider } from '@mysten/dapp-kit';
+import { getFullnodeUrl } from '@mysten/sui/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// 네트워크 설정
+const { networkConfig } = createNetworkConfig({
+  localnet: { url: getFullnodeUrl('localnet') },
+  mainnet: { url: getFullnodeUrl('mainnet') },
+});
+
+const queryClient = new QueryClient();
 
 const App = () => {
   const [name, setName] = useState('');                               // NFT 이름 상태
   const [description, setDescription] = useState('');                 // NFT 설명 상태
   const [url, setUrl] = useState('');                                 // 외부 리소스 URL 상태
-  const [wallet_address, setWalletAddress] = useState('');                           // 지갑 주소 상태
+  const [wallet_address, setWalletAddress] = useState('');            // 지갑 주소 상태
   const [file, setFile] = useState<File | null>(null);                // GPX 파일 업로드
 
   // 기본정보 입력
@@ -53,71 +65,77 @@ const App = () => {
   };
 
   return (
-    <div>
-      <h1>NFT 생성 테스트</h1>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSubmit();
-        }}
-      >
-        <label htmlFor="nft-name">
-          NFT 이름:
-          <input
-            type="text"
-            id="nft-name"
-            name="nftName"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-        </label>
-        <br />
-        <label htmlFor="description">
-          설명:
-          <input
-            type="text"
-            id="description"
-            name="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </label>
-        <br />
-        <label htmlFor="url">
-          URL:
-          <input
-            type="text"
-            id="url"
-            name="url"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-          />
-        </label>
-        <br />
-        <label htmlFor="wallet-address">
-          지갑 주소:
-          <input
-            type="text"
-            id="wallet-address"
-            name="walletAddress"
-            value={wallet_address}
-            onChange={(e) => setWalletAddress(e.target.value)}
-          />
-        </label>
-        <br />
-        <label htmlFor="gpx-file">
-          GPX 파일:
-          <input
-            type="file"
-            id="gpx-file"
-            name="gpxFile"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}  // 상태 업데이트
-          />
-        </label>
-        <br />
-        <button type="submit">Submit</button>
-      </form>
-    </div>
+    <QueryClientProvider client={queryClient}>
+      <SuiClientProvider networks={networkConfig} defaultNetwork="localnet">
+        <WalletProvider>
+          <div>
+            <h1>NFT 생성 테스트</h1>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit();
+              }}
+            >
+              <label htmlFor="nft-name">
+                NFT 이름:
+                <input
+                  type="text"
+                  id="nft-name"
+                  name="nftName"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </label>
+              <br />
+              <label htmlFor="description">
+                설명:
+                <input
+                  type="text"
+                  id="description"
+                  name="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                />
+              </label>
+              <br />
+              <label htmlFor="url">
+                URL:
+                <input
+                  type="text"
+                  id="url"
+                  name="url"
+                  value={url}
+                  onChange={(e) => setUrl(e.target.value)}
+                />
+              </label>
+              <br />
+              <label htmlFor="wallet-address">
+                지갑 주소:
+                <input
+                  type="text"
+                  id="wallet-address"
+                  name="walletAddress"
+                  value={wallet_address}
+                  onChange={(e) => setWalletAddress(e.target.value)}
+                />
+              </label>
+              <br />
+              <label htmlFor="gpx-file">
+                GPX 파일:
+                <input
+                  type="file"
+                  id="gpx-file"
+                  name="gpxFile"
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}  // 상태 업데이트
+                />
+              </label>
+              <br />
+              <button type="submit">Submit</button>
+            </form>
+          </div>
+        </WalletProvider>
+      </SuiClientProvider>
+    </QueryClientProvider>
   );
 };
 

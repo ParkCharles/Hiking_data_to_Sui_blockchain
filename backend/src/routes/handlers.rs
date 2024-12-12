@@ -8,8 +8,6 @@ use futures_util::stream::StreamExt;
 use crate::models::structs::NftData;
 use crate::services::gpx::parse_gpx_and_save_json;
 
-use sui_sdk::rpc_types::SuiTransactionBlockResponse;
-use sui_sdk::SuiClient;
 
 // 공통 에러 핸들러 정의
 #[derive(Debug)]
@@ -132,4 +130,3 @@ pub async fn upload_and_parse_gpx(mut body: FormData) -> Result<impl warp::Reply
         Err(warp::reject::custom(CustomError("Invalid form data".to_string())))
     }
 }
-
